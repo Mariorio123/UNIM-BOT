@@ -4,7 +4,7 @@ import os
 TOKEN = os.environ['DISCORD_TOKEN']
 SALON_BIENVENUE_ID = 1501257698300268554
 SALON_TWITTER_ID = 1540447152050933820
-SALON_THREADS_ID = 1540447072501633105
+SALON_SNAP_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
 
 intents = discord.Intents.default()
@@ -20,7 +20,7 @@ async def on_ready():
 async def on_member_join(member):
     salon = bot.get_channel(SALON_BIENVENUE_ID)
     salon_tw = f"<#{SALON_TWITTER_ID}>"
-    salon_th = f"<#{SALON_THREADS_ID}>"
+    salon_th = f"<#{SALON_SNAP_ID}>"
     salon_ig = f"<#{SALON_INSTAGRAM_ID}>"
 
     if salon:
@@ -34,7 +34,7 @@ async def on_member_join(member):
                 f"🚀 **Twitter, Threads ou Instagram — choisis ta plateforme**\n"
                 f"Tu peux travailler sur l'une ou l'autre :\n"
                 f"🐦 Twitter 👉 {salon_tw}\n"
-                f"🧵 Threads 👉 {salon_th}\n"
+                f"🧵 Snap 👉 {salon_th}\n"
                 f"📸 Instagram 👉 {salon_ig}\n\n"
                 f"Va voir ces salons pour tout savoir sur chaque plateforme et te lancer."
             ),
