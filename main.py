@@ -7,6 +7,7 @@ SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
 SALON_PAIEMENT_ID = 1501257450496458894  # ID du salon "infos paiement"
+SALON_PARRAINAGE_ID = 1538731299500589117  # ID du salon #parrainage
 
 intents = discord.Intents.default()
 intents.members = True
@@ -14,56 +15,23 @@ intents.message_content = True
 
 bot = discord.Client(intents=intents)
 
-MESSAGE_PAIEMENT = """# 🎯 Bienvenue dans l'équipe UNIM Agency
+MESSAGE_PARRAINAGE = """🎁 Programme de parrainage UNIM AGENCY
 
-## 💰 NOUVELLE STRUCTURE DE RÉMUNÉRATION
+Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
 
-*(Remplace intégralement l'ancienne grille)*
+Comment ça marche :
+1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
+2️⃣ Quand un ami arrive, il va dans #qui-t-a-invité et indique que c'est toi qui l'as invité.
+3️⃣ Chaque invitation validée = 1 point pour toi.
 
-La rémunération est calculée **par jour**, en fonction :
+🏆 Chaque fin de semaine (dimanche), le top 3 gagne :
+🥇 1er → $5
+🥈 2e → $3
+🥉 3e → $2
 
-* du **nombre d'abonnements générés**
-OU
-* du **nombre de clics générés**
-* de la **plateforme utilisée** (Instagram)
+⚠️ Minimum 5 invitations dans la semaine pour être éligible à une récompense.
 
----
-
-## 🔹 RÉMUNÉRATION PAR ABONNEMENTS (SUBS) – **PAR JOUR**
-
-### **Instagram**
-
-Jusqu'à 15 subs : 0,50 USD par sub
-Plus de 15 et jusqu'à 30 subs : 0,60 USD par sub
-Plus de 30 et jusqu'à 50 subs : 0,70 USD par sub
-Plus de 50 et jusqu'à 80 subs : 0,80 USD par sub
-Plus de 80 subs : 0,90 USD par sub
-
----
-
-## 🔹 RÉMUNÉRATION PAR CLICS – PAR JOUR
-
-### **Instagram**
-
-* Jusqu'à 150 clics : 0,040 USD par clic
-* Plus de 150 et jusqu'à 300 clics : 0,047 USD par clic
-* Plus de 300 et jusqu'à 500 clics : 0,053 USD par clic
-* Plus de 500 et jusqu'à 800 clics : 0,060 USD par clic
-* Plus de 800 clics : 0,067 USD par clic
----
-
-## 📅 MODALITÉS DE PAIEMENT
-
-* Paiements effectués **toutes les 2 semaines**
-* Périodes de calcul :
-
-Le 1er de chaque mois : pour la période du 08 au 23
-Le 16 de chaque mois pour la période du 23 au 08
-* Paiement prioritaire en **USDC (ERC-20 – réseau Ethereum)**
-
-⚠️ Les performances sont **calculées quotidiennement**, puis consolidées sur la période de paiement.
-
----
+Plus tu invites, plus tu gagnes. 💰
 @everyone"""
 
 
@@ -71,10 +39,10 @@ Le 16 de chaque mois pour la période du 23 au 08
 async def on_ready():
     print(f"Connecté en tant que {bot.user}")
 
-    salon = bot.get_channel(SALON_PAIEMENT_ID)
+    salon = bot.get_channel(SALON_PARRAINAGE_ID)
     if salon:
         await salon.send(
-            MESSAGE_PAIEMENT,
+            MESSAGE_PARRAINAGE,
             allowed_mentions=discord.AllowedMentions(everyone=True)
         )
 
