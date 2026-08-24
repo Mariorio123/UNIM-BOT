@@ -20,25 +20,6 @@ bot = discord.Client(intents=intents)
 
 points = {}  # pseudo -> nombre de points
 
-MESSAGE_PARRAINAGE = f"""🎁 Programme de parrainage UNIM AGENCY
-
-Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
-
-Comment ça marche :
-1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
-2️⃣ Quand un ami arrive, il va dans <#{SALON_QUI_TA_INVITE_ID}> et indique que c'est toi qui l'as invité.
-3️⃣ Chaque invitation validée = 1 point pour toi.
-
-🏆 Chaque fin de semaine (dimanche), le top 3 gagne :
-🥇 1er → $5
-🥈 2e → $3
-🥉 3e → $2
-
-⚠️ Minimum 5 invitations dans la semaine pour être éligible à une récompense.
-
-Plus tu invites, plus tu gagnes. 💰
-@everyone"""
-
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
     pseudo_parrain = discord.ui.TextInput(
@@ -52,7 +33,7 @@ class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
         parrain = self.pseudo_parrain.value.strip()
         points[parrain] = points.get(parrain, 0) + 1
         await interaction.response.send_message(
-            f"✅ Merci ! **{parrain}** vient de gagner 1 point.",
+            "✅ C'est enregistré, merci !",
             ephemeral=True
         )
 
