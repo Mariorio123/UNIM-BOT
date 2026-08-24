@@ -6,9 +6,10 @@ SALON_BIENVENUE_ID = 1501257698300268554
 SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
-SALON_QUI_TA_INVITE_ID = 1538731348255047720  # remplace par ton vrai ID si différent
-SALON_PARRAINAGE_ID = 1538731299500589117     # remplace par ton vrai ID
-SALON_EXPLICATION_ID = 1501257521321480446    # remplace par ton vrai ID du salon #explication
+SALON_QUI_TA_INVITE_ID = 1538731348255047720  # vérifie que c'est le bon
+SALON_PARRAINAGE_ID = 1538731299500589117     # vérifie que c'est le bon
+SALON_EXPLICATION_ID = 1501257521321480446    # ID du salon #explication
+SALON_COMMENCEMENT_ID = 1532334459934736455   # ID du salon #commencement
 
 intents = discord.Intents.default()
 intents.members = True
@@ -37,32 +38,33 @@ Comment ça marche :
 Plus tu invites, plus tu gagnes. 💰
 @everyone"""
 
-MESSAGE_EXPLICATION = """📌 **Organisation du Discord — UNIM AGENCY**
+MESSAGE_EXPLICATION = f"""📁 **Organisation du Discord UNIM AGENCY**
 
-Une fois arrivé sur le **Discord officiel**, vous pouvez commencer le travail.
-Voici les différentes sections 👇
+Une fois arrivé sur le **Discord officiel**, voici les différentes sections 👇
 
-🎓 **Partie Formation**
-Vous y trouverez toutes les réponses à vos questions :
+📚 **Partie Formation**
+Toutes les réponses à tes questions :
 • Formations écrites
 • Vidéos explicatives
-• Méthodes pour éviter les **bannissements**
+• Méthodes pour **éviter les bannissements**
 
-💼 **Partie Travail**
+🧵 **Partie Travail**
 C'est ici que tout se passe :
-• Vous récupérez les **identités** à utiliser sur Instagram
+• Tu récupères les **identités** à utiliser sur Instagram
 • ⚠️ **1 compte = 1 identité** (très important à respecter)
 
-💬 **Partie Général**
+📢 **Partie Général**
 • Annonces importantes
-• Tips, etc...
+• Tips, etc.
 
 🎁 **Partie Autres**
-• Système d'affiliation
-• Jeux pour gagner de l'argent 💸
+• Système d'affiliation pour gagner plus 💰
 • Preuves de paiement
 
-📌 Rendez-vous dans le salon pour passer l'entretien. : https://ptb.discord.com/channels/1500885983250350080/1500885984072437803"""
+➡️ **Étape suivante**
+Rends-toi dans <#1532334459934736455> pour démarrer 🚀
+
+UNIM AGENCY • Organisation"""
 
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
