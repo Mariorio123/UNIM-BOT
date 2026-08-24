@@ -10,6 +10,7 @@ SALON_QUI_TA_INVITE_ID = 1538731348255047720
 SALON_PARRAINAGE_ID = 1538731299500589117
 SALON_EXPLICATION_ID = 1501257521321480446
 SALON_COMMENCEMENT_ID = 1532334459934736455
+SALON_ENTRETIEN_ID = 1500885984072437803
 
 intents = discord.Intents.default()
 intents.members = True
@@ -24,7 +25,7 @@ MESSAGE_PARRAINAGE = f"""🎁 Programme de parrainage UNIM AGENCY
 Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
 
 Comment ça marche :
-1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
+1 Tu fais venir tes amis → ils rejoignent et deviennent VA.
 2️⃣ Quand un ami arrive, il va dans <#{SALON_QUI_TA_INVITE_ID}> et indique que c'est toi qui l'as invité.
 3️⃣ Chaque invitation validée = 1 point pour toi.
 
@@ -103,6 +104,23 @@ async def on_ready():
         )
         embed_explication.set_footer(text="UNIM AGENCY • Organisation")
         await salon_explication.send(embed=embed_explication)
+
+    salon_commencement = bot.get_channel(SALON_COMMENCEMENT_ID)
+    if salon_commencement:
+        embed_commencement = discord.Embed(
+            title="🚀 Début du travail",
+            description=(
+                f"Pour commencer, nous devons t'expliquer le fonctionnement lors d'un entretien 🎙️\n\n"
+                f"Voici l'horaire d'entretien, chaque jour :\n\n"
+                f"🇧🇯 **Entretien (heure béninoise)**\n"
+                f"🕗 20h00\n\n"
+                f"🎵 **Salon d'entretien**\n"
+                f"Rejoins le salon vocal 👉 <#{SALON_ENTRETIEN_ID}>"
+            ),
+            color=discord.Color.green()
+        )
+        embed_commencement.set_footer(text="UNIM AGENCY • Commencement")
+        await salon_commencement.send(embed=embed_commencement)
 
 
 @bot.event
