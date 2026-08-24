@@ -7,6 +7,7 @@ SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
 SALON_QUI_TA_INVITE_ID = 1538731348255047720  # ID du salon #qui-t-a-invité
+SALON_PARRAINAGE_ID = 1538731299500589117     # ID du salon #parrainage
 
 intents = discord.Intents.default()
 intents.members = True
@@ -15,6 +16,25 @@ intents.message_content = True
 bot = discord.Client(intents=intents)
 
 points = {}  # pseudo -> nombre de points
+
+MESSAGE_PARRAINAGE = f"""🎁 Programme de parrainage UNIM AGENCY
+
+Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
+
+Comment ça marche :
+1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
+2️⃣ Quand un ami arrive, il va dans <#1538731348255047720> et indique que c'est toi qui l'as invité.
+3️⃣ Chaque invitation validée = 1 point pour toi.
+
+🏆 Chaque fin de semaine (dimanche), le top 3 gagne :
+🥇 1er → $5
+🥈 2e → $3
+🥉 3e → $2
+
+⚠️ Minimum 5 invitations dans la semaine pour être éligible à une récompense.
+
+Plus tu invites, plus tu gagnes. 💰
+@everyone"""
 
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
@@ -53,8 +73,8 @@ async def on_ready():
     print(f"Connecté en tant que {bot.user}")
     bot.add_view(BoutonInvite())
 
-    salon = bot.get_channel(SALON_QUI_TA_INVITE_ID)
-    if salon:
+    salon_invite = bot.get_channel(SALON_QUI_TA_INVITE_ID)
+    if salon_invite:
         embed = discord.Embed(
             title="🤝 Qui t'a invité ?",
             description=(
@@ -67,7 +87,14 @@ async def on_ready():
             ),
             color=discord.Color.gold()
         )
-        await salon.send(embed=embed, view=BoutonInvite())
+        await salon_invite.send(embed=embed, view=BoutonInvite())
+
+    salon_parrainage = bot.get_channel(SALON_PARRAINAGE_ID)
+    if salon_parrainage:
+        await salon_parrainage.send(
+            MESSAGE_PARRAINAGE,
+            allowed_mentions=discord.AllowedMentions(everyone=True)
+        )
 
 
 @bot.event
