@@ -6,8 +6,9 @@ SALON_BIENVENUE_ID = 1501257698300268554
 SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
-SALON_QUI_TA_INVITE_ID = 1538731348255047720  # ID du salon #qui-t-a-invité
-SALON_PARRAINAGE_ID = 1538731299500589117     # ID du salon #parrainage
+SALON_QUI_TA_INVITE_ID = 1538731348255047720  # remplace par ton vrai ID si différent
+SALON_PARRAINAGE_ID = 1538731299500589117     # remplace par ton vrai ID
+SALON_EXPLICATION_ID = 1501257521321480446    # remplace par ton vrai ID du salon #explication
 
 intents = discord.Intents.default()
 intents.members = True
@@ -35,6 +36,33 @@ Comment ça marche :
 
 Plus tu invites, plus tu gagnes. 💰
 @everyone"""
+
+MESSAGE_EXPLICATION = """📌 **Organisation du Discord — UNIM AGENCY**
+
+Une fois arrivé sur le **Discord officiel**, vous pouvez commencer le travail.
+Voici les différentes sections 👇
+
+🎓 **Partie Formation**
+Vous y trouverez toutes les réponses à vos questions :
+• Formations écrites
+• Vidéos explicatives
+• Méthodes pour éviter les **bannissements**
+
+💼 **Partie Travail**
+C'est ici que tout se passe :
+• Vous récupérez les **identités** à utiliser sur Instagram
+• ⚠️ **1 compte = 1 identité** (très important à respecter)
+
+💬 **Partie Général**
+• Annonces importantes
+• Tips, etc...
+
+🎁 **Partie Autres**
+• Système d'affiliation
+• Jeux pour gagner de l'argent 💸
+• Preuves de paiement
+
+📌 Rendez-vous dans le salon pour passer l'entretien. : https://ptb.discord.com/channels/1500885983250350080/1500885984072437803"""
 
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
@@ -73,28 +101,9 @@ async def on_ready():
     print(f"Connecté en tant que {bot.user}")
     bot.add_view(BoutonInvite())
 
-    salon_invite = bot.get_channel(SALON_QUI_TA_INVITE_ID)
-    if salon_invite:
-        embed = discord.Embed(
-            title="🤝 Qui t'a invité ?",
-            description=(
-                "Bienvenue ! 👋\n\n"
-                "Si un VA t'a fait venir sur UNIM AGENCY, clique le bouton ci-dessous "
-                "et indique **son pseudo**.\n"
-                "Ça lui permet de gagner des points pour le classement de la semaine "
-                "(et une récompense 💰).\n\n"
-                "👉 Clique sur « Indiquer qui m'a invité » juste en dessous."
-            ),
-            color=discord.Color.gold()
-        )
-        await salon_invite.send(embed=embed, view=BoutonInvite())
-
-    salon_parrainage = bot.get_channel(SALON_PARRAINAGE_ID)
-    if salon_parrainage:
-        await salon_parrainage.send(
-            MESSAGE_PARRAINAGE,
-            allowed_mentions=discord.AllowedMentions(everyone=True)
-        )
+    salon_explication = bot.get_channel(SALON_EXPLICATION_ID)
+    if salon_explication:
+        await salon_explication.send(MESSAGE_EXPLICATION)
 
 
 @bot.event
