@@ -94,18 +94,31 @@ async def on_message(message):
 
     if message.content.strip() == "!classement":
         if not message.author.guild_permissions.administrator:
-            return  # ignore silencieusement, ne révèle rien aux non-admins
+            return
+
+        try:
+            await message.delete()
+        except discord.Forbidden:
+            pass
 
         if not points:
-            await message.channel.send("Aucun point enregistré pour le moment.", delete_after=15)
+            try:
+                await message.author.send("Aucun point enregistré pour le moment.")
+            except discord.Forbidden:
+                pass
             return
+
         classement_trie = sorted(points.items(), key=lambda x: x[1], reverse=True)
-        texte = "🏆 **Classement parrainage** (visible admin uniquement)\n\n"
+        texte = "🏆 **Classement parrainage**\n\n"
         medailles = ["🥇", "🥈", "🥉"]
         for i, (pseudo, pts) in enumerate(classement_trie[:10]):
             medaille = medailles[i] if i < 3 else f"{i+1}."
             texte += f"{medaille} **{pseudo}** — {pts} point(s)\n"
-        await message.channel.send(texte)
+
+        try:
+            await message.author.send(texte)
+        except discord.Forbidden:
+            pass
 
 
 bot.run(TOKEN)
