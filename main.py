@@ -25,7 +25,7 @@ MESSAGE_PARRAINAGE = f"""🎁 Programme de parrainage UNIM AGENCY
 Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
 
 Comment ça marche :
-1 Tu fais venir tes amis → ils rejoignent et deviennent VA.
+1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
 2️⃣ Quand un ami arrive, il va dans <#{SALON_QUI_TA_INVITE_ID}> et indique que c'est toi qui l'as invité.
 3️⃣ Chaque invitation validée = 1 point pour toi.
 
@@ -76,52 +76,6 @@ async def on_ready():
     print(f"Connecté en tant que {bot.user}")
     bot.add_view(BoutonInvite())
 
-    salon_explication = bot.get_channel(SALON_EXPLICATION_ID)
-    if salon_explication:
-        embed_explication = discord.Embed(
-            title="📁 Organisation du Discord UNIM AGENCY",
-            description=(
-                f"Une fois arrivé sur le **Discord officiel**, voici les différentes sections 👇\n\n"
-                f"📚 **Partie Formation**\n"
-                f"Toutes les réponses à tes questions :\n"
-                f"• Formations écrites\n"
-                f"• Vidéos explicatives\n"
-                f"• Méthodes pour **éviter les bannissements**\n\n"
-                f"🧵 **Partie Travail**\n"
-                f"C'est ici que tout se passe :\n"
-                f"• Tu récupères les **identités** à utiliser sur Instagram\n"
-                f"• ⚠️ **1 compte = 1 identité** (très important à respecter)\n\n"
-                f"📢 **Partie Général**\n"
-                f"• Annonces importantes\n"
-                f"• Tips, etc.\n\n"
-                f"🎁 **Partie Autres**\n"
-                f"• Système d'affiliation pour gagner plus 💰\n"
-                f"• Preuves de paiement\n\n"
-                f"➡️ **Étape suivante**\n"
-                f"Rends-toi dans <#{SALON_COMMENCEMENT_ID}> pour démarrer 🚀"
-            ),
-            color=discord.Color.gold()
-        )
-        embed_explication.set_footer(text="UNIM AGENCY • Organisation")
-        await salon_explication.send(embed=embed_explication)
-
-    salon_commencement = bot.get_channel(SALON_COMMENCEMENT_ID)
-    if salon_commencement:
-        embed_commencement = discord.Embed(
-            title="🚀 Début du travail",
-            description=(
-                f"Pour commencer, nous devons t'expliquer le fonctionnement lors d'un entretien 🎙️\n\n"
-                f"Voici l'horaire d'entretien, chaque jour :\n\n"
-                f"🇧🇯 **Entretien (heure béninoise)**\n"
-                f"🕗 20h00\n\n"
-                f"🎵 **Salon d'entretien**\n"
-                f"Rejoins le salon vocal 👉 <#{SALON_ENTRETIEN_ID}>"
-            ),
-            color=discord.Color.green()
-        )
-        embed_commencement.set_footer(text="UNIM AGENCY • Commencement")
-        await salon_commencement.send(embed=embed_commencement)
-
 
 @bot.event
 async def on_member_join(member):
@@ -158,11 +112,14 @@ async def on_message(message):
         return
 
     if message.content.strip() == "!classement":
+        if not message.author.guild_permissions.administrator:
+            return  # ignore silencieusement, ne révèle rien aux non-admins
+
         if not points:
-            await message.channel.send("Aucun point enregistré pour le moment.")
+            await message.channel.send("Aucun point enregistré pour le moment.", delete_after=15)
             return
         classement_trie = sorted(points.items(), key=lambda x: x[1], reverse=True)
-        texte = "🏆 **Classement parrainage**\n\n"
+        texte = "🏆 **Classement parrainage** (visible admin uniquement)\n\n"
         medailles = ["🥇", "🥈", "🥉"]
         for i, (pseudo, pts) in enumerate(classement_trie[:10]):
             medaille = medailles[i] if i < 3 else f"{i+1}."
