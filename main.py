@@ -6,10 +6,10 @@ SALON_BIENVENUE_ID = 1501257698300268554
 SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
-SALON_QUI_TA_INVITE_ID = 1538731348255047720  # vérifie que c'est le bon
-SALON_PARRAINAGE_ID = 1538731299500589117     # vérifie que c'est le bon
-SALON_EXPLICATION_ID = 1501257521321480446    # ID du salon #explication
-SALON_COMMENCEMENT_ID = 1532334459934736455   # ID du salon #commencement
+SALON_QUI_TA_INVITE_ID = 1538731348255047720
+SALON_PARRAINAGE_ID = 1538731299500589117
+SALON_EXPLICATION_ID = 1501257521321480446
+SALON_COMMENCEMENT_ID = 1532334459934736455
 
 intents = discord.Intents.default()
 intents.members = True
@@ -25,7 +25,7 @@ Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
 
 Comment ça marche :
 1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
-2️⃣ Quand un ami arrive, il va dans <#1538731348255047720> et indique que c'est toi qui l'as invité.
+2️⃣ Quand un ami arrive, il va dans <#{SALON_QUI_TA_INVITE_ID}> et indique que c'est toi qui l'as invité.
 3️⃣ Chaque invitation validée = 1 point pour toi.
 
 🏆 Chaque fin de semaine (dimanche), le top 3 gagne :
@@ -37,34 +37,6 @@ Comment ça marche :
 
 Plus tu invites, plus tu gagnes. 💰
 @everyone"""
-
-MESSAGE_EXPLICATION = f"""📁 **Organisation du Discord UNIM AGENCY**
-
-Une fois arrivé sur le **Discord officiel**, voici les différentes sections 👇
-
-📚 **Partie Formation**
-Toutes les réponses à tes questions :
-• Formations écrites
-• Vidéos explicatives
-• Méthodes pour **éviter les bannissements**
-
-🧵 **Partie Travail**
-C'est ici que tout se passe :
-• Tu récupères les **identités** à utiliser sur Instagram
-• ⚠️ **1 compte = 1 identité** (très important à respecter)
-
-📢 **Partie Général**
-• Annonces importantes
-• Tips, etc.
-
-🎁 **Partie Autres**
-• Système d'affiliation pour gagner plus 💰
-• Preuves de paiement
-
-➡️ **Étape suivante**
-Rends-toi dans <#1532334459934736455> pour démarrer 🚀
-
-UNIM AGENCY • Organisation"""
 
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
@@ -105,7 +77,32 @@ async def on_ready():
 
     salon_explication = bot.get_channel(SALON_EXPLICATION_ID)
     if salon_explication:
-        await salon_explication.send(MESSAGE_EXPLICATION)
+        embed_explication = discord.Embed(
+            title="📁 Organisation du Discord UNIM AGENCY",
+            description=(
+                f"Une fois arrivé sur le **Discord officiel**, voici les différentes sections 👇\n\n"
+                f"📚 **Partie Formation**\n"
+                f"Toutes les réponses à tes questions :\n"
+                f"• Formations écrites\n"
+                f"• Vidéos explicatives\n"
+                f"• Méthodes pour **éviter les bannissements**\n\n"
+                f"🧵 **Partie Travail**\n"
+                f"C'est ici que tout se passe :\n"
+                f"• Tu récupères les **identités** à utiliser sur Instagram\n"
+                f"• ⚠️ **1 compte = 1 identité** (très important à respecter)\n\n"
+                f"📢 **Partie Général**\n"
+                f"• Annonces importantes\n"
+                f"• Tips, etc.\n\n"
+                f"🎁 **Partie Autres**\n"
+                f"• Système d'affiliation pour gagner plus 💰\n"
+                f"• Preuves de paiement\n\n"
+                f"➡️ **Étape suivante**\n"
+                f"Rends-toi dans <#{SALON_COMMENCEMENT_ID}> pour démarrer 🚀"
+            ),
+            color=discord.Color.gold()
+        )
+        embed_explication.set_footer(text="UNIM AGENCY • Organisation")
+        await salon_explication.send(embed=embed_explication)
 
 
 @bot.event
