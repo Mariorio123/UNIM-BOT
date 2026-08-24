@@ -6,8 +6,7 @@ SALON_BIENVENUE_ID = 1501257698300268554
 SALON_TWITTER_ID = 1540447152050933820
 SALON_THREADS_ID = 1540447072501633105
 SALON_INSTAGRAM_ID = 1540447221516869793
-SALON_PAIEMENT_ID = 1501257450496458894  # ID du salon "infos paiement"
-SALON_PARRAINAGE_ID = 1538731299500589117  # ID du salon #parrainage
+SALON_QUI_TA_INVITE_ID = 1538731348255047720  # ID du salon #qui-t-a-invité
 
 intents = discord.Intents.default()
 intents.members = True
@@ -15,36 +14,60 @@ intents.message_content = True
 
 bot = discord.Client(intents=intents)
 
-MESSAGE_PARRAINAGE = """🎁 Programme de parrainage UNIM AGENCY
+points = {}  # pseudo -> nombre de points
 
-Invite tes amis à rejoindre UNIM AGENCY en tant que VA ! 🚀
 
-Comment ça marche :
-1️⃣ Tu fais venir tes amis → ils rejoignent et deviennent VA.
-2️⃣ Quand un ami arrive, il va dans #qui-t-a-invité et indique que c'est toi qui l'as invité.
-3️⃣ Chaque invitation validée = 1 point pour toi.
+class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
+    pseudo_parrain = discord.ui.TextInput(
+        label="Pseudo de la personne qui t'a invité",
+        placeholder="Ex: Mario",
+        required=True,
+        max_length=100
+    )
 
-🏆 Chaque fin de semaine (dimanche), le top 3 gagne :
-🥇 1er → $5
-🥈 2e → $3
-🥉 3e → $2
+    async def on_submit(self, interaction: discord.Interaction):
+        parrain = self.pseudo_parrain.value.strip()
+        points[parrain] = points.get(parrain, 0) + 1
+        await interaction.response.send_message(
+            f"✅ Merci ! **{parrain}** vient de gagner 1 point.",
+            ephemeral=True
+        )
 
-⚠️ Minimum 5 invitations dans la semaine pour être éligible à une récompense.
 
-Plus tu invites, plus tu gagnes. 💰
-@everyone"""
+class BoutonInvite(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(
+        label="Indiquer qui m'a invité",
+        emoji="🤝",
+        style=discord.ButtonStyle.success,
+        custom_id="bouton_qui_ta_invite"
+    )
+    async def indiquer_invite(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(FormulaireInvite())
 
 
 @bot.event
 async def on_ready():
     print(f"Connecté en tant que {bot.user}")
+    bot.add_view(BoutonInvite())
 
-    salon = bot.get_channel(SALON_PARRAINAGE_ID)
+    salon = bot.get_channel(SALON_QUI_TA_INVITE_ID)
     if salon:
-        await salon.send(
-            MESSAGE_PARRAINAGE,
-            allowed_mentions=discord.AllowedMentions(everyone=True)
+        embed = discord.Embed(
+            title="🤝 Qui t'a invité ?",
+            description=(
+                "Bienvenue ! 👋\n\n"
+                "Si un VA t'a fait venir sur UNIM AGENCY, clique le bouton ci-dessous "
+                "et indique **son pseudo**.\n"
+                "Ça lui permet de gagner des points pour le classement de la semaine "
+                "(et une récompense 💰).\n\n"
+                "👉 Clique sur « Indiquer qui m'a invité » juste en dessous."
+            ),
+            color=discord.Color.gold()
         )
+        await salon.send(embed=embed, view=BoutonInvite())
 
 
 @bot.event
@@ -74,6 +97,24 @@ async def on_member_join(member):
         embed.set_thumbnail(url=member.display_avatar.url)
         embed.set_footer(text="UNIM AGENCY • Bienvenue dans l'équipe !")
         await salon.send(embed=embed)
+
+
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+
+    if message.content.strip() == "!classement":
+        if not points:
+            await message.channel.send("Aucun point enregistré pour le moment.")
+            return
+        classement_trie = sorted(points.items(), key=lambda x: x[1], reverse=True)
+        texte = "🏆 **Classement parrainage**\n\n"
+        medailles = ["🥇", "🥈", "🥉"]
+        for i, (pseudo, pts) in enumerate(classement_trie[:10]):
+            medaille = medailles[i] if i < 3 else f"{i+1}."
+            texte += f"{medaille} **{pseudo}** — {pts} point(s)\n"
+        await message.channel.send(texte)
 
 
 bot.run(TOKEN)
