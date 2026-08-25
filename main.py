@@ -1,5 +1,7 @@
 import discord
 import os
+import asyncio
+import yt_dlp
 
 TOKEN = os.environ['DISCORD_TOKEN']
 SALON_BIENVENUE_ID = 1501257698300268554
@@ -19,6 +21,98 @@ intents.message_content = True
 bot = discord.Client(intents=intents)
 
 points = {}  # pseudo -> nombre de points
+
+file_attente = {}  # id_serveur -> liste de (url, titre)
+en_lecture = {}     # id_serveur -> titre actuel
+
+YDL_OPTIONS = {
+    'format': 'bestaudio/best',
+    'noplaylist': True,
+    'quiet': True,
+    'default_search': 'ytsearch',
+}
+
+FFMPEG_OPTIONS = {
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'options': '-vn',
+}
+
+
+async def recherche_audio(requete):
+    loop = asyncio.get_event_loop()
+    with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl:
+        infos = await loop.run_in_executor(None, lambda: ydl.extract_info(requete, download=False))
+        if 'entries' in infos:
+            infos = infos['entries'][0]
+        return infos['url'], infos['title']
+
+
+class ControlesMusique(discord.ui.View):
+    def __init__(self, id_serveur):
+        super().__init__(timeout=None)
+        self.id_serveur = id_serveur
+
+    @discord.ui.button(emoji="⏸️", style=discord.ButtonStyle.secondary, custom_id="musique_pause")
+    async def pause(self, interaction: discord.Interaction, button: discord.ui.Button):
+        vc = interaction.guild.voice_client
+        if vc and vc.is_playing():
+            vc.pause()
+            await interaction.response.send_message("⏸️ En pause.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Rien à mettre en pause.", ephemeral=True)
+
+    @discord.ui.button(emoji="▶️", style=discord.ButtonStyle.secondary, custom_id="musique_resume")
+    async def reprendre(self, interaction: discord.Interaction, button: discord.ui.Button):
+        vc = interaction.guild.voice_client
+        if vc and vc.is_paused():
+            vc.resume()
+            await interaction.response.send_message("▶️ Reprise.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Rien à reprendre.", ephemeral=True)
+
+    @discord.ui.button(emoji="⏭️", style=discord.ButtonStyle.secondary, custom_id="musique_skip")
+    async def suivant(self, interaction: discord.Interaction, button: discord.ui.Button):
+        vc = interaction.guild.voice_client
+        if vc and (vc.is_playing() or vc.is_paused()):
+            vc.stop()
+            await interaction.response.send_message("⏭️ Musique suivante.", ephemeral=True)
+        else:
+            await interaction.response.send_message("Rien à passer.", ephemeral=True)
+
+    @discord.ui.button(emoji="⏹️", style=discord.ButtonStyle.danger, custom_id="musique_stop")
+    async def stop_musique(self, interaction: discord.Interaction, button: discord.ui.Button):
+        vc = interaction.guild.voice_client
+        file_attente[self.id_serveur] = []
+        if vc:
+            vc.stop()
+            await vc.disconnect()
+        await interaction.response.send_message("⏹ Arrêté, file vidée.", ephemeral=True)
+
+
+def jouer_suivant(id_serveur, voice_client, channel):
+    if file_attente.get(id_serveur):
+        url, titre = file_attente[id_serveur].pop(0)
+        source = discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS)
+
+        def apres(erreur):
+            asyncio.run_coroutine_threadsafe(
+                envoyer_et_continuer(channel, id_serveur, voice_client),
+                bot.loop
+            )
+
+        voice_client.play(source, after=apres)
+        en_lecture[id_serveur] = titre
+    else:
+        en_lecture[id_serveur] = None
+
+
+async def envoyer_et_continuer(channel, id_serveur, voice_client):
+    jouer_suivant(id_serveur, voice_client, channel)
+    if en_lecture.get(id_serveur):
+        await channel.send(
+            f"🎶 En train de jouer : **{en_lecture[id_serveur]}**",
+            view=ControlesMusique(id_serveur)
+        )
 
 
 class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
@@ -92,6 +186,55 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
+    id_serveur = message.guild.id if message.guild else None
+
+    # --- Commandes musique ---
+    if message.content.startswith("!play "):
+        requete = message.content[6:].strip()
+        if not message.author.voice:
+            await message.channel.send("Connecte-toi d'abord à un salon vocal.")
+            return
+
+        salon_vocal = message.author.voice.channel
+        voice_client = message.guild.voice_client
+        if not voice_client:
+            voice_client = await salon_vocal.connect()
+
+        await message.channel.send(f"🔎 Recherche : {requete}...")
+        url, titre = await recherche_audio(requete)
+
+        if id_serveur not in file_attente:
+            file_attente[id_serveur] = []
+        file_attente[id_serveur].append((url, titre))
+
+        if not voice_client.is_playing() and not voice_client.is_paused():
+            jouer_suivant(id_serveur, voice_client, message.channel)
+            await message.channel.send(
+                f"🎶 En train de jouer : **{en_lecture[id_serveur]}**",
+                view=ControlesMusique(id_serveur)
+            )
+        else:
+            await message.channel.send(f"➕ Ajouté à la file : **{titre}**")
+        return
+
+    if message.content.strip() == "!queue":
+        liste = file_attente.get(id_serveur, [])
+        if not liste:
+            await message.channel.send("File d'attente vide.")
+        else:
+            texte = "\n".join(f"{i+1}. {titre}" for i, (_, titre) in enumerate(liste))
+            await message.channel.send(f"📋 **File d'attente :**\n{texte}")
+        return
+
+    if message.content.strip() == "!leave":
+        voice_client = message.guild.voice_client
+        if voice_client:
+            file_attente[id_serveur] = []
+            await voice_client.disconnect()
+            await message.channel.send("👋 Déconnecté.")
+        return
+
+    # --- Commande classement (admin uniquement, en privé) ---
     if message.content.strip() == "!classement":
         if not message.author.guild_permissions.administrator:
             return
