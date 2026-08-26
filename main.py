@@ -2,6 +2,7 @@ import discord
 import os
 import asyncio
 import yt_dlp
+import imageio_ffmpeg
 
 TOKEN = os.environ['DISCORD_TOKEN']
 SALON_BIENVENUE_ID = 1501257698300268554
@@ -92,8 +93,8 @@ class ControlesMusique(discord.ui.View):
 def jouer_suivant(id_serveur, voice_client, channel):
     if file_attente.get(id_serveur):
         url, titre = file_attente[id_serveur].pop(0)
-        source = discord.FFmpegPCMAudio(url, **FFMPEG_OPTIONS)
-
+       chemin_ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+source = discord.FFmpegPCMAudio(url, executable=chemin_ffmpeg, **FFMPEG_OPTIONS)
         def apres(erreur):
             asyncio.run_coroutine_threadsafe(
                 envoyer_et_continuer(channel, id_serveur, voice_client),
