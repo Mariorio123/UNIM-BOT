@@ -1,15 +1,22 @@
 import discord
 import discord
 import discord.opus
+import ctypes.util
 
 if not discord.opus.is_loaded():
-    try:
-        discord.opus.load_opus('libopus.so.0')
-    except OSError:
+    chemin_opus = ctypes.util.find_library('opus')
+    noms_a_tester = [chemin_opus, 'libopus.so.0', 'libopus.so', 'opus']
+    for nom in noms_a_tester:
+        if nom is None:
+            continue
         try:
-            discord.opus.load_opus('opus')
+            discord.opus.load_opus(nom)
+            print(f"✅ Opus chargé : {nom}")
+            break
         except OSError:
-            print("⚠️ Impossible de charger Opus")
+            continue
+    if not discord.opus.is_loaded():
+        print("⚠️ Impossible de charger Opus, tous les essais ont échoué")
 import os
 import asyncio
 import yt_dlp
