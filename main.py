@@ -1,4 +1,15 @@
 import discord
+import discord
+import discord.opus
+
+if not discord.opus.is_loaded():
+    try:
+        discord.opus.load_opus('libopus.so.0')
+    except OSError:
+        try:
+            discord.opus.load_opus('opus')
+        except OSError:
+            print("⚠️ Impossible de charger Opus")
 import os
 import asyncio
 import yt_dlp
