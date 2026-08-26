@@ -87,14 +87,15 @@ class ControlesMusique(discord.ui.View):
         if vc:
             vc.stop()
             await vc.disconnect()
-        await interaction.response.send_message("⏹ Arrêté, file vidée.", ephemeral=True)
+        await interaction.response.send_message("⏹️ Arrêté, file vidée.", ephemeral=True)
 
 
 def jouer_suivant(id_serveur, voice_client, channel):
     if file_attente.get(id_serveur):
         url, titre = file_attente[id_serveur].pop(0)
-       chemin_ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
-source = discord.FFmpegPCMAudio(url, executable=chemin_ffmpeg, **FFMPEG_OPTIONS)
+        chemin_ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        source = discord.FFmpegPCMAudio(url, executable=chemin_ffmpeg, **FFMPEG_OPTIONS)
+
         def apres(erreur):
             asyncio.run_coroutine_threadsafe(
                 envoyer_et_continuer(channel, id_serveur, voice_client),
@@ -189,7 +190,6 @@ async def on_message(message):
 
     id_serveur = message.guild.id if message.guild else None
 
-    # --- Commandes musique ---
     if message.content.startswith("!play "):
         requete = message.content[6:].strip()
         if not message.author.voice:
@@ -235,7 +235,6 @@ async def on_message(message):
             await message.channel.send("👋 Déconnecté.")
         return
 
-    # --- Commande classement (admin uniquement, en privé) ---
     if message.content.strip() == "!classement":
         if not message.author.guild_permissions.administrator:
             return
