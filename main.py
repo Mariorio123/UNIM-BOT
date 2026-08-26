@@ -1,16 +1,15 @@
 import discord
-import discord
 import discord.opus
+import os
+import asyncio
+import yt_dlp
+import imageio_ffmpeg
 
 if not discord.opus.is_loaded():
     try:
         discord.opus.load_opus('opus')
     except OSError:
         pass
-import os
-import asyncio
-import yt_dlp
-import imageio_ffmpeg
 
 TOKEN = os.environ['DISCORD_TOKEN']
 SALON_BIENVENUE_ID = 1501257698300268554
