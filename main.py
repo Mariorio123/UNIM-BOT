@@ -28,16 +28,21 @@ intents.message_content = True
 
 bot = discord.Client(intents=intents)
 
-points = {}  # pseudo -> nombre de points
+points = {}
 
-file_attente = {}  # id_serveur -> liste de (url, titre)
-en_lecture = {}     # id_serveur -> titre actuel
+file_attente = {}
+en_lecture = {}
 
 YDL_OPTIONS = {
     'format': 'bestaudio/best',
     'noplaylist': True,
     'quiet': True,
     'default_search': 'ytsearch',
+    'extractor_args': {
+        'youtube': {
+            'player_client': ['android'],
+        }
+    },
 }
 
 FFMPEG_OPTIONS = {
@@ -135,10 +140,7 @@ class FormulaireInvite(discord.ui.Modal, title="Qui t'a invité ?"):
     async def on_submit(self, interaction: discord.Interaction):
         parrain = self.pseudo_parrain.value.strip()
         points[parrain] = points.get(parrain, 0) + 1
-        await interaction.response.send_message(
-            "✅ C'est enregistré, merci !",
-            ephemeral=True
-        )
+        await interaction.response.send_message("✅ C'est enregistré, merci !", ephemeral=True)
 
 
 class BoutonInvite(discord.ui.View):
@@ -209,7 +211,11 @@ async def on_message(message):
             voice_client = await salon_vocal.connect()
 
         await message.channel.send(f"🔎 Recherche : {requete}...")
-        url, titre = await recherche_audio(requete)
+        try:
+            url, titre = await recherche_audio(requete)
+        except Exception as e:
+            await message.channel.send(f"❌ Impossible de trouver cette musique. Réessaie avec un autre titre.")
+            return
 
         if id_serveur not in file_attente:
             file_attente[id_serveur] = []
@@ -245,26 +251,22 @@ async def on_message(message):
     if message.content.strip() == "!classement":
         if not message.author.guild_permissions.administrator:
             return
-
         try:
             await message.delete()
         except discord.Forbidden:
             pass
-
         if not points:
             try:
                 await message.author.send("Aucun point enregistré pour le moment.")
             except discord.Forbidden:
                 pass
             return
-
         classement_trie = sorted(points.items(), key=lambda x: x[1], reverse=True)
         texte = "🏆 **Classement parrainage**\n\n"
         medailles = ["🥇", "🥈", "🥉"]
         for i, (pseudo, pts) in enumerate(classement_trie[:10]):
             medaille = medailles[i] if i < 3 else f"{i+1}."
             texte += f"{medaille} **{pseudo}** — {pts} point(s)\n"
-
         try:
             await message.author.send(texte)
         except discord.Forbidden:
