@@ -1,12 +1,5 @@
 {
   "packages": {
     "ffmpeg": "latest"
-  },
-  "steps": {
-    "install-opus": {
-      "commands": [
-        "apt-get update && apt-get install -y libopus0 libopus-dev"
-      ]
-    }
   }
 }
