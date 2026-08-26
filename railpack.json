@@ -1,0 +1,6 @@
+{
+  "packages": {
+    "ffmpeg": "latest",
+    "libopus": "latest"
+  }
+}
