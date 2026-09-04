@@ -169,8 +169,7 @@ async def on_member_join(member):
             title="🎊 Bienvenue dans l'agence UNIM AGENCY !",
             description=(
                 f"Salut {member.mention}, content de t'accueillir 🎉\n\n"
-                f"Tu es ici pour travailler en tant que **VA (Virtual Assistant)** "
-                f"sur **Instagram** 📸\n\n"
+                f"Tu es ici pour travailler en tant que **VA (Virtual Assistant)** 📸\n\n"
                 f"N'hésite pas à échanger avec la communauté et te lancer !"
             ),
             color=discord.Color.blue()
